@@ -11,12 +11,10 @@
     </el-container>
       <el-tag
         v-for="tag in tags"
-        :key="tag.name"
+        :key="tag"
         class="mx-1"
-        closable
-        :type="tag.type"
       >
-        {{ tag.name }}
+        {{ tag }}
       </el-tag>
     <el-container>
       <el-main>
@@ -39,7 +37,7 @@
               />
             </template>
             <template #extra>
-              
+
             </template>
           </el-result>
         </div>
@@ -59,7 +57,7 @@
 
 <script lang="ts">
 import { alertProps, drawerEmits } from "element-plus";
-import { defineComponent, reactive, toRefs, ref,computed, watch } from "vue";
+import { defineComponent, reactive, toRefs, computed, watch } from "vue";
 import { getWeather,getForecast } from "../request/api";
 import { weatherData } from "../type/listWeather";
 import { forecastData } from "../type/listForecast";
@@ -71,21 +69,9 @@ export default defineComponent({
     let dataW = reactive(new weatherData())
     let arr:string[]=[]
     let arr2:string[]=[]
-    const items = reactive([])
     let count = 0
 
-    const tags = ref([
-
-
-    { name: 'Tag 2', type: 'success' },
-    { name: 'Tag 3', type: 'info' },
-    { name: 'Tag 4', type: 'warning' },
-
-    
-  ])
-
-  
-
+    let tags = reactive<string[]>([])
 
     const formInline = reactive({
       city:"",
@@ -98,18 +84,17 @@ export default defineComponent({
       if (count<3) {
         for (let index = 0; index < count+1; index++) {
           arr2[index] = arr[index];
-          
         }
-        
       } else {
         for (let index = count; index >count-3 ; index--) {
           arr2[count-index]=arr[index];
         }
       }
+      count++ 
+      // console.log(arr2)
+      // console.log(arr)
+      tags.splice(0, tags.length, arr2[0], arr2[1], arr2[2])
 
-      count++
-      console.log(arr2)      
-      console.log(arr)
       getWeather(formInline.city).then(
         res=>{
 
@@ -120,20 +105,16 @@ export default defineComponent({
       )
       getForecast(formInline.city).then(
         res=>{
-
           dataF.list = res.data.list
-
         }
       )
-
-
     }
-
-
     return{ onSubmit, 
       formInline, 
       ...toRefs(dataF),
-      tags}
+      tags,
+      dataW
+    }
   },
 })
 </script>
