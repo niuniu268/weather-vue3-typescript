@@ -1,18 +1,151 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+  <div class="common-layout">
+    <el-container>
+      <el-header>
+        <el-row :gutter="20">
+          <el-col :span="4"><img src="../assets/logo.png" class = "logo" /></el-col>
+          <el-col :span="16"><h2> weather </h2></el-col>
+          <el-col :span="4"></el-col>
+        </el-row> 
+      </el-header>
+    </el-container>
+      <el-tag
+        v-for="tag in tags"
+        :key="tag.name"
+        class="mx-1"
+        closable
+        :type="tag.type"
+      >
+        {{ tag.name }}
+      </el-tag>
+    <el-container>
+      <el-main>
+        <div class="select-box">
+          <el-form :inline="true" :model="formInline" class="demo-form-inline">
+            <el-form-item label="city">
+              <el-input v-model="formInline.city" placeholder="city name" />
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="onSubmit">Query</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+
+        <div>
+          <el-result title="222" sub-title="Sorry, request error">
+            <template #icon>
+              <el-image
+                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+              />
+            </template>
+            <template #extra>
+              
+            </template>
+          </el-result>
+        </div>
+
+        <div>
+          <el-table :data="list" stripe style="width: 100%">
+            <el-table-column prop="dt_txt" label="Time" width="180" />
+            <el-table-column prop="weather[0].description" label="Description" width="180" />
+            <el-table-column prop="main.feels_like" label="Temperature" />
+          </el-table>
+        </div>
+      </el-main>
+    </el-container>
+
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
-
+import { alertProps, drawerEmits } from "element-plus";
+import { defineComponent, reactive, toRefs, ref,computed, watch } from "vue";
+import { getWeather,getForecast } from "../request/api";
+import { weatherData } from "../type/listWeather";
+import { forecastData } from "../type/listForecast";
 export default defineComponent({
-  name: 'HomeView',
-  components: {
-    HelloWorld,
+  name: "HomeView",
+  setup(){
+
+    const dataF = reactive(new forecastData())
+    let dataW = reactive(new weatherData())
+    let arr:string[]=[]
+    let arr2:string[]=[]
+    const items = reactive([])
+    let count = 0
+
+    const tags = ref([
+
+
+    { name: 'Tag 2', type: 'success' },
+    { name: 'Tag 3', type: 'info' },
+    { name: 'Tag 4', type: 'warning' },
+
+    
+  ])
+
+  
+
+
+    const formInline = reactive({
+      city:"",
+    })
+
+    const onSubmit = () => {
+      // console.log(formInline)
+      
+      arr[count]=formInline.city
+      if (count<3) {
+        for (let index = 0; index < count+1; index++) {
+          arr2[index] = arr[index];
+          
+        }
+        
+      } else {
+        for (let index = count; index >count-3 ; index--) {
+          arr2[count-index]=arr[index];
+        }
+      }
+
+      count++
+      console.log(arr2)      
+      console.log(arr)
+      getWeather(formInline.city).then(
+        res=>{
+
+          dataW = res.data
+
+          // console.log(dataW)
+        }
+      )
+      getForecast(formInline.city).then(
+        res=>{
+
+          dataF.list = res.data.list
+
+        }
+      )
+
+
+    }
+
+
+    return{ onSubmit, 
+      formInline, 
+      ...toRefs(dataF),
+      tags}
   },
-});
+})
 </script>
+
+<style lang="scss" scoped>
+
+.el-header{
+  height: 80px;
+  background-color: aqua;
+  .logo{
+  height: 80px;
+  }
+}
+
+</style>

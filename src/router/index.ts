@@ -5,7 +5,18 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: HomeView,
+    // children:[
+    //   {
+    //     path:"weather",
+    //     name:"weather",
+    //     meta:{
+    //       isshow: true,
+    //       title:"weather"
+    //     },
+    //     component:()=> import("../views/WeatherView.vue")
+    //   }
+    // ]
   },
   {
     path: '/about',
