@@ -8,7 +8,8 @@
           <el-col :span="4"></el-col>
         </el-row> 
       </el-header>
-      <div>{{ currPos.lat }}  +  {{ currPos.lng }}</div>
+      <div class="lattitude">Latitude: {{ currPos.lat }}  Longtitude:  {{ currPos.lng }}</div>
+      <!-- <div> {{ dataW }}</div> -->
     </el-container>
       <el-tag
         v-for="tag in tags"
@@ -54,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, computed, onMounted, watchEffect, } from "vue";
+import { defineComponent, reactive, toRefs, computed, watchEffect, } from "vue";
 import { getWeather,getForecast,getCurrentForecast,getCurrentWeather } from "../request/api";
 import { weatherData } from "../type/listWeather";
 import { forecastData } from "../type/listForecast";
@@ -83,19 +84,17 @@ export default defineComponent({
       })
     )
 
-    let arr3:number[] = []
-
     watchEffect(()=>{
-      arr3[0] = currPos.value.lat,
-      arr3[1] = currPos.value.lng
+
       getCurrentWeather(currPos.value.lat,currPos.value.lng).then(res=>{
         dataW.weather = res.data.weather
-        console.log(dataW)
+        dataW.main = res.data.main
+        // console.log(dataW)
       })
 
       getCurrentForecast(currPos.value.lat,currPos.value.lng).then(res=>{
         dataF.list = res.data.list
-        console.log(dataF)
+        // console.log(dataF)
 
       })
     })
@@ -117,14 +116,13 @@ export default defineComponent({
       // console.log(arr2)
       // console.log(arr)
       tags.splice(0, tags.length, arr2[0], arr2[1], arr2[2])
+      localStorage.setItem('geo',JSON.stringify(arr2))
 
       getWeather(formInline.city).then(
         res=>{
-
-          // dataW.weather = res.data.weather
           dataW.weather = res.data.weather
-
-          console.log(dataW)
+          dataW.main = res.data.main
+          // console.log(dataW)
         }
       )
       getForecast(formInline.city).then(
@@ -138,7 +136,9 @@ export default defineComponent({
       ...toRefs(dataF),
       tags,
       ...toRefs(dataW),
-      currPos
+      currPos,
+      dataW,
+      dataF
     }
   },
 })
@@ -152,6 +152,10 @@ export default defineComponent({
   .logo{
   height: 80px;
   }
+}
+.lattitude{
+  left: 500px;
+  height: 80px;
 }
 
 </style>
