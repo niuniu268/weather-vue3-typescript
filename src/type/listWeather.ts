@@ -9,9 +9,9 @@ export interface weatherInfo{
     description: string,
     icon:string
 }
-export interface weatherList{
-    weather:weatherInfo[]
-}
+// export interface weatherList{
+//     weather:weatherInfo[]
+// }
 export interface mainInfo{
     temp:number,
     feels_like:number,
@@ -39,7 +39,7 @@ export class weatherData{
         lon: 0,
         lat: 0
     }
-    weather:weatherList[]=[]
+    weather:weatherInfo[]=[]
     base=""
     main:mainInfo={
         temp:0,

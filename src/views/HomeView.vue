@@ -30,16 +30,13 @@
         </div>
 
         <div>
-          <el-result title="222" sub-title="Sorry, request error">
-            <template #icon>
-              <el-image
-                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-              />
-            </template>
-            <template #extra>
-
-            </template>
-          </el-result>
+          <div v-for="item in weather" :key="item.id">
+            <el-image :src="`https://openweathermap.org/img/wn/${item.icon}.png`" fit="contain"></el-image>
+            <el-descriptions title="Info">
+              <el-descriptions-item label="Weather">{{ item.main }}</el-descriptions-item>
+              <el-descriptions-item label="Detail">{{ item.description }}</el-descriptions-item>
+            </el-descriptions>
+          </div>
         </div>
 
         <div>
@@ -56,21 +53,20 @@
 </template>
 
 <script lang="ts">
-import { alertProps, drawerEmits } from "element-plus";
 import { defineComponent, reactive, toRefs, computed, watch } from "vue";
 import { getWeather,getForecast } from "../request/api";
 import { weatherData } from "../type/listWeather";
 import { forecastData } from "../type/listForecast";
+
 export default defineComponent({
   name: "HomeView",
   setup(){
 
     const dataF = reactive(new forecastData())
-    let dataW = reactive(new weatherData())
+    const dataW = reactive(new weatherData())
     let arr:string[]=[]
     let arr2:string[]=[]
     let count = 0
-
     let tags = reactive<string[]>([])
 
     const formInline = reactive({
@@ -98,9 +94,10 @@ export default defineComponent({
       getWeather(formInline.city).then(
         res=>{
 
-          dataW = res.data
+          // dataW.weather = res.data.weather
+          dataW.weather = res.data.weather
 
-          // console.log(dataW)
+          console.log(dataW)
         }
       )
       getForecast(formInline.city).then(
@@ -113,7 +110,7 @@ export default defineComponent({
       formInline, 
       ...toRefs(dataF),
       tags,
-      dataW
+      ...toRefs(dataW)
     }
   },
 })
