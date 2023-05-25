@@ -8,6 +8,7 @@
           <el-col :span="4"></el-col>
         </el-row> 
       </el-header>
+      <div>{{ currPos.lat }}  +  {{ currPos.lng }}</div>
     </el-container>
       <el-tag
         v-for="tag in tags"
@@ -53,10 +54,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, computed, watch } from "vue";
-import { getWeather,getForecast } from "../request/api";
+import { defineComponent, reactive, toRefs, computed, onMounted, watchEffect, } from "vue";
+import { getWeather,getForecast,getCurrentForecast,getCurrentWeather } from "../request/api";
 import { weatherData } from "../type/listWeather";
 import { forecastData } from "../type/listForecast";
+import { useGeoLocation } from '../useGeolocation';
 
 export default defineComponent({
   name: "HomeView",
@@ -71,6 +73,31 @@ export default defineComponent({
 
     const formInline = reactive({
       city:"",
+    })
+
+    const {coords} = useGeoLocation()
+    const currPos = computed(
+      () => ({
+        lat: coords.value.latitude,
+        lng: coords.value.longitude
+      })
+    )
+
+    let arr3:number[] = []
+
+    watchEffect(()=>{
+      arr3[0] = currPos.value.lat,
+      arr3[1] = currPos.value.lng
+      getCurrentWeather(currPos.value.lat,currPos.value.lng).then(res=>{
+        dataW.weather = res.data.weather
+        console.log(dataW)
+      })
+
+      getCurrentForecast(currPos.value.lat,currPos.value.lng).then(res=>{
+        dataF.list = res.data.list
+        console.log(dataF)
+
+      })
     })
 
     const onSubmit = () => {
@@ -110,7 +137,8 @@ export default defineComponent({
       formInline, 
       ...toRefs(dataF),
       tags,
-      ...toRefs(dataW)
+      ...toRefs(dataW),
+      currPos
     }
   },
 })

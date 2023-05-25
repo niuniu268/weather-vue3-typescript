@@ -17,3 +17,21 @@ export function getForecast(cityName:string){
         }
     )
 }
+
+export function getCurrentWeather(latitude:number, longitude:number) {
+    return service(
+        {
+            url: "/weather?lat="+latitude+"&lon="+longitude+"&appid=71180e7d01eaf25fd23d6aa2e81e44e9",
+            method: "get"
+        }
+    )
+}
+
+export function getCurrentForecast(latitude:number, longitude:number){
+    return service(
+        {
+            url:"/forecast?lat="+latitude+"&lon="+longitude+"&cnt=3&appid=71180e7d01eaf25fd23d6aa2e81e44e9",
+            method: "get"
+        }
+    )
+}
